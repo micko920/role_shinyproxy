@@ -57,7 +57,7 @@
       - name: "shinyproxy"
         description: "shinyproxy"
         documentation: "https://www.shinyproxy.io/"
-        start_command: "java -jar /opt/shinyproxy-2.5.0_patch-1.jar"
+        start_command: "java -jar /opt/shinyproxy/shinyproxy-2.5.0_patch-1.jar"
         type: "simple"
         user_name: "shinyproxy"
         group_name: "shinyproxy"
@@ -68,9 +68,6 @@
           TimeoutStopSec: "5s"
           LimitNOFILE: "1048576"
           LimitNPROC: "512"
-          PrivateTmp: "true"
-          ProtectSystem: "full"
-          AmbientCapabilities: "CAP_NET_BIND_SERVICE"
   when: systemd_pid_1 is defined and systemd_pid_1
 
 - name: Configure the shinyproxy service.
