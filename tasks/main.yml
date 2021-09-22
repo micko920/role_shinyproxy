@@ -1,0 +1,73 @@
+---
+- include_tasks: is_systemd.yml
+
+# Variable configuration.
+- include_tasks: variables.yml
+
+- name: Add the shinyproxy group
+  group:
+    name: "{{ shinyproxy_group }}"
+    state: present
+
+- name: Add the shinyproxy user
+  user:
+    name: "{{ shinyproxy_user }}"
+    password_lock: true
+    shell: /bin/bash
+    append: true
+
+- name: Ensure shinyproxy packages are installed.
+  apt:
+    name: "{{ shinyproxy_packages }}"
+    state: present
+
+- name: download pkg...
+  become: yes
+  become_user: root
+  get_url:
+    url: '{{ shinyproxy_pkg_url }}'
+    dest: /tmp/{{ shinyproxy_pkg }}
+    mode: 0644
+
+- name: Install deb file for shinyproxy
+  apt:
+    deb: "/tmp/{{ shinyproxy_pkg }}"
+
+- name: configure | update (server) configuration file
+  template:
+    src: application.yml.j2
+    dest: /opt/shinyproxy/application.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create shinyproxy service instance
+  import_role:
+    name: micko920.role_createservice
+  vars:
+    service_list:
+      - name: "shinyproxy"
+        description: "shinyproxy"
+        documentation: "https://www.shinyproxy.io/"
+        start_command: "java -jar /opt/shinyproxy-2.5.0.jar"
+        type: "simple"
+        user_name: "shinyproxy"
+        group_name: "shinyproxy"
+        after: "network.target network-online.target"
+        requires: "network-online.target"
+        extra_values:
+          WorkingDirectory: "/opt/shinyproxy"
+          TimeoutStopSec: "5s"
+          LimitNOFILE: "1048576"
+          LimitNPROC: "512"
+          PrivateTmp: "true"
+          ProtectSystem: "full"
+          AmbientCapabilities: "CAP_NET_BIND_SERVICE"
+  when: systemd_pid_1 is defined and systemd_pid_1
+
+- name: Configure the shinyproxy service.
+  systemd:
+    name: shinyproxy
+    state: "{{ shinyproxy_state }}"
+    enabled: "{{ shinyproxy_enabled_at_boot }}"
+  when: systemd_pid_1 is defined and systemd_pid_1
