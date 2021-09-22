@@ -41,6 +41,14 @@
     group: root
     mode: 0644
 
+- name: copy jar to bin folder
+  copy:
+    src: shinyproxy-2.5.0_patch-1.jar
+    dest: "{{ shinyproxy_bin_path }}/shinyproxy-2.5.0_patch-1.jar"
+    owner: "{{ shinyproxy_user }}"
+    group: "{{ shinyproxy_group }}"
+    mode: u=xrw,g=xr,o=xr
+
 - name: create shinyproxy service instance
   import_role:
     name: micko920.role_createservice
@@ -49,7 +57,7 @@
       - name: "shinyproxy"
         description: "shinyproxy"
         documentation: "https://www.shinyproxy.io/"
-        start_command: "java -jar /opt/shinyproxy-2.5.0.jar"
+        start_command: "java -jar /opt/shinyproxy-2.5.0_patch-1.jar"
         type: "simple"
         user_name: "shinyproxy"
         group_name: "shinyproxy"
