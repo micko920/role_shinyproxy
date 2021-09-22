@@ -11,7 +11,7 @@ proxy:
   - name: jeff
     password: password
   docker:
-{% if docker_internal_network is defined or  container_network != "" %}
+{% if docker_internal_network is defined and docker_internal_network and container_network != "" %}
       internal-networking: true
 {% else %}
       url: http://localhost:2375
@@ -22,13 +22,13 @@ proxy:
     description: Application which demonstrates the basics of a Shiny app
     container-cmd: ["R", "-e", "shinyproxy::run_01_hello()"]
     container-image: openanalytics/shinyproxy-demo
-{% if docker_internal_network is defined and  container_network != "" %}
+{% if docker_internal_network is defined and docker_internal_network and container_network != "" %}
     container-network: {{ container_network }}
 {% endif %}
   - id: 06_tabsets
     container-cmd: ["R", "-e", "shinyproxy::run_06_tabsets()"]
     container-image: openanalytics/shinyproxy-demo
-{% if docker_internal_network is defined and  container_network != "" %}
+{% if docker_internal_network is defined and docker_internal_network and container_network != "" %}
     container-network: {{ container_network }}
 {% endif %}
 
