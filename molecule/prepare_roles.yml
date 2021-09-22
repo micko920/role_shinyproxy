@@ -1,4 +1,5 @@
 ---
 roles:
   - role: micko920.homelab_base_system
+  - role: micko920.role_gitlfs
   - role: micko920.role_java
