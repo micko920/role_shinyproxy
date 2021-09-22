@@ -41,13 +41,16 @@
     group: root
     mode: 0644
 
-- name: copy jar to bin folder
-  copy:
-    src: shinyproxy-2.5.0_patch-1.jar
+- name: Get the jar
+  get_url:
+    url: "{{ shinyproxy_url }}"
     dest: "{{ shinyproxy_bin_path }}/shinyproxy-2.5.0_patch-1.jar"
     owner: "{{ shinyproxy_user }}"
     group: "{{ shinyproxy_group }}"
     mode: u=xrw,g=xr,o=xr
+  register: install_shinyproxy
+  until: install_shinyproxy is succeeded
+  retries: 3
 
 - name: create shinyproxy service instance
   import_role:
